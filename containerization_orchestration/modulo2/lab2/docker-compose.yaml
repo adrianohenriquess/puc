@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    networks:
+      - webnet
+    depends_on:
+      - flask
+  
+  flask:
+    build: contador-sessao #diretorio onde esta o serviço contador
+    environment:
+      - REDIS_HOST=redis # <- Note o uso de variaveis de ambiente a serem interpretadas pelo serviço
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    ports:
+      - "5000"
+    networks:
+      - webnet    
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - webnet
+  
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: exemplo
+    ports:
+      - "3306:3306"
+    networks:
+      - webnet
+
+networks:
+  webnet:
